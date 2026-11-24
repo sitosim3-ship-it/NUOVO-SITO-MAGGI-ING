@@ -3640,3 +3640,127 @@ section[id], [id="top"] { scroll-margin-top: 84px; }
     font-size: 11px;
   }
 }
+
+/* ==========================================================================
+   Moduli che inviano davvero (FormSubmit): candidature e contatti
+   ========================================================================== */
+.form-honey { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* Casella privacy (entrambi i moduli) */
+.form-check {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 4px 0 22px;
+  cursor: pointer;
+}
+.form-check input {
+  flex: 0 0 auto;
+  width: 18px !important;
+  height: 18px;
+  margin: 2px 0 0;
+  padding: 0 !important;
+  accent-color: var(--blue-deep);
+  border: 0 !important;
+}
+.contact-form .form-check span {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.5;
+}
+.form-check a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.button[disabled] { opacity: 0.7; cursor: wait; }
+
+/* Modulo candidature, sul riquadro blu scuro */
+.careers-cta { align-items: stretch; }
+.careers-cta > .eyebrow { align-self: flex-start; }
+.apply-form { width: 100%; margin-top: 6px; }
+.apply-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+.apply-form label { display: block; margin-bottom: 18px; }
+.apply-form label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #b9d1dc;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.apply-form label > span small {
+  margin-left: 6px;
+  color: #90aab6;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.apply-form input,
+.apply-form select,
+.apply-form textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  color: var(--white);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(207, 228, 236, 0.35);
+  border-radius: 0;
+  font: inherit;
+  font-size: 15px;
+}
+.apply-form select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #cfe4ec 50%), linear-gradient(135deg, #cfe4ec 50%, transparent 50%); background-position: calc(100% - 12px) 55%, calc(100% - 7px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.apply-form select option { color: var(--ink); }
+.apply-form textarea { resize: vertical; min-height: 70px; }
+.apply-form input:focus,
+.apply-form select:focus,
+.apply-form textarea:focus { outline: none; border-bottom-color: var(--blue); }
+.apply-form input[type="file"] { padding: 10px 0; font-size: 13px; color: #cfe4ec; }
+.apply-form input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(207, 228, 236, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.apply-form__error { display: block; margin-top: 6px; color: #ffb4a8; font-size: 13px; font-style: normal; }
+.apply-form .form-check span { margin: 0; color: #cfe4ec; font-size: 13px; font-weight: 400; letter-spacing: normal; text-transform: none; line-height: 1.5; }
+.apply-form .form-check input { accent-color: var(--blue); }
+.careers-cta .button--primary { color: var(--ink); background: var(--white); }
+.careers-cta .button--primary:hover { color: var(--ink); background: var(--blue-wash); }
+.apply-success { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px 0 6px; color: var(--white); }
+.apply-success svg { color: var(--blue); }
+.apply-success h4 { margin: 0; font-family: 'DM Sans', sans-serif; font-size: 1.6rem; font-weight: 500; }
+.apply-success p { margin: 0; color: #b9d1dc; font-size: 14px; line-height: 1.7; }
+.apply-success button { margin-top: 6px; padding: 0; color: var(--white); background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; font: inherit; font-size: 13px; cursor: pointer; }
+
+@media (max-width: 560px) {
+  .apply-form__row { grid-template-columns: 1fr; }
+}
+
+/* Numeri: griglia 2x2 anche sui telefoni piccoli */
+@media (max-width: 420px) {
+  .impact__inner { grid-template-columns: repeat(2, 1fr); gap: 30px 18px; }
+  .impact__item:nth-child(odd) { padding-left: 0; border-left: 0; }
+}
+
+/* Banner cookie più compatto da telefono */
+@media (max-width: 640px) {
+  .cookie-banner {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    width: calc(100% - 20px);
+    margin-bottom: 10px;
+    padding: 12px 14px;
+  }
+  .cookie-banner__text { font-size: 12px; line-height: 1.45; }
+  .cookie-banner__ok { align-self: center; padding: 10px 14px; font-size: 13px; }
+}

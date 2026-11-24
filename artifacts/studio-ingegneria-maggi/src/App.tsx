@@ -824,8 +824,8 @@ function LegalPage({ page }: { page: 'privacy' | 'cookie' }) {
 
           <h2>2. Dati personali trattati</h2>
           <p><strong>Dati di navigazione.</strong> I sistemi informatici e le procedure preposte al funzionamento del sito acquisiscono, nel corso del normale esercizio, alcuni dati tecnici la cui trasmissione è implicita nell&rsquo;uso dei protocolli di comunicazione di Internet (ad esempio indirizzo IP, tipo di browser e dispositivo, data e ora della richiesta, pagine visitate). Questi dati sono utilizzati al solo fine di garantire il funzionamento e la sicurezza del sito.</p>
-          <p><strong>Dati forniti volontariamente.</strong> Quando compili il modulo &laquo;Contatti&raquo; o ci scrivi via email, trattiamo i dati che ci comunichi: nome, indirizzo email e il contenuto del messaggio.</p>
-          <p><strong>Candidature.</strong> Se ci invii una candidatura via email (sezione &laquo;Lavora con noi&raquo;), trattiamo i dati contenuti nel messaggio e nel curriculum allegato: dati anagrafici e di contatto, percorso di studi ed esperienze professionali. Ti chiediamo di non inserire nel curriculum dati particolari (ad esempio relativi alla salute) se non strettamente necessari.</p>
+          <p><strong>Dati forniti volontariamente.</strong> Quando compili il modulo &laquo;Parliamo del progetto&raquo; o ci scrivi via email, trattiamo i dati che ci comunichi: nome, indirizzo email, eventuale numero di telefono e il contenuto del messaggio.</p>
+          <p><strong>Candidature.</strong> Se ci invii una candidatura con il modulo &laquo;Lavora con noi&raquo; o via email, trattiamo i dati indicati (nome, cognome, email, eventuale telefono, profilo professionale, messaggio) e quelli contenuti nel curriculum o portfolio allegato: dati anagrafici e di contatto, percorso di studi ed esperienze professionali. Ti chiediamo di non inserire nel curriculum dati particolari (ad esempio relativi alla salute) se non strettamente necessari.</p>
 
           <h2>3. Finalità e basi giuridiche</h2>
           <p>Rispondere alle richieste inviate tramite il modulo o via email e gestire i relativi contatti (art. 6, par. 1, lett. b — riscontro a una richiesta dell&rsquo;interessato; e lett. f — legittimo interesse a gestire le comunicazioni). Valutare le candidature spontanee ricevute ed eventualmente contattare il candidato per un colloquio (art. 6, par. 1, lett. b — misure precontrattuali adottate su richiesta dell&rsquo;interessato). Garantire il funzionamento, la manutenzione e la sicurezza del sito (art. 6, par. 1, lett. f). Adempiere a eventuali obblighi di legge (art. 6, par. 1, lett. c), ove applicabili.</p>
@@ -837,10 +837,10 @@ function LegalPage({ page }: { page: 'privacy' | 'cookie' }) {
           <p>Il trattamento avviene con strumenti elettronici, adottando misure tecniche e organizzative adeguate a proteggere i dati da accessi non autorizzati, perdita o divulgazione.</p>
 
           <h2>6. Destinatari dei dati</h2>
-          <p>I dati possono essere trattati da soggetti che forniscono servizi tecnici per conto del Titolare (ad esempio il fornitore di hosting ed eventuali servizi di invio email), nominati responsabili del trattamento ove previsto dall&rsquo;art. 28 GDPR. I dati non sono diffusi né ceduti a terzi per loro finalità.</p>
+          <p>I dati possono essere trattati da soggetti che forniscono servizi tecnici per conto del Titolare (ad esempio il fornitore di hosting e il servizio FormSubmit &mdash; formsubmit.co &mdash; che inoltra via email allo studio i messaggi e gli allegati inviati con i moduli del sito, senza conservare gli allegati), nominati responsabili del trattamento ove previsto dall&rsquo;art. 28 GDPR. I dati non sono diffusi né ceduti a terzi per loro finalità.</p>
 
           <h2>7. Trasferimenti verso Paesi terzi</h2>
-          <p>Il sito è ospitato su GitHub Pages (GitHub, Inc., USA) e utilizza i caratteri tipografici Google Fonts (Google LLC, USA). Gli eventuali trasferimenti di dati verso gli Stati Uniti avvengono sulla base di garanzie adeguate ai sensi degli artt. 44 e ss. GDPR (Clausole Contrattuali Standard e/o adesione al Data Privacy Framework).</p>
+          <p>Il sito è ospitato su GitHub Pages (GitHub, Inc., USA) utilizza i caratteri tipografici Google Fonts (Google LLC, USA) e il servizio FormSubmit per l&rsquo;inoltro dei moduli, che può comportare il trattamento dei dati al di fuori dell&rsquo;Unione europea. Gli eventuali trasferimenti di dati verso gli Stati Uniti avvengono sulla base di garanzie adeguate ai sensi degli artt. 44 e ss. GDPR (Clausole Contrattuali Standard e/o adesione al Data Privacy Framework).</p>
 
           <h2>8. Periodo di conservazione</h2>
           <p>I dati inviati tramite il modulo sono conservati per il tempo necessario a gestire la richiesta e ad assolvere eventuali obblighi di legge; i curricula ricevuti per un periodo massimo di 24 mesi, salvo diversa richiesta dell&rsquo;interessato; i dati tecnici di navigazione per il tempo strettamente necessario alle finalità indicate.</p>
@@ -920,9 +920,97 @@ function CertificationsPage() {
   );
 }
 
+// Moduli del sito: il sito è statico (GitHub Pages), quindi i moduli vengono
+// inoltrati via email a info@ dal servizio gratuito FormSubmit (formsubmit.co).
+// Al primo invio FormSubmit manda a info@ un'email di attivazione da confermare.
+const STUDIO_EMAIL = 'info@studioingegneriamaggi.it';
+const FORM_ENDPOINT = `https://formsubmit.co/${STUDIO_EMAIL}`;
+const MAX_CV_BYTES = 10 * 1024 * 1024;
+const returnUrl = (hash: string) => `${window.location.origin}${import.meta.env.BASE_URL}${hash}`;
+
+function FormHiddenFields({ subject, next }: { subject: string; next: string }) {
+  return (
+    <>
+      <input type="hidden" name="_subject" value={subject} />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" value={returnUrl(next)} />
+      {/* campo trappola anti-spam: le persone non lo vedono */}
+      <input type="text" name="_honey" className="form-honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+    </>
+  );
+}
+
+function PrivacyCheck({ after = '' }: { after?: string }) {
+  return (
+    <label className="form-check">
+      <input type="checkbox" name="privacy" value="Presa visione dell'informativa" required />
+      <span>Ho letto l’<a href={`${import.meta.env.BASE_URL}#privacy`} target="_blank" rel="noopener noreferrer">informativa sulla privacy</a>{after}.</span>
+    </label>
+  );
+}
+
+function ApplyForm({ done, onReset }: { done: boolean; onReset: () => void }) {
+  const [fileError, setFileError] = useState('');
+  const [sending, setSending] = useState(false);
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const input = event.currentTarget.elements.namedItem('curriculum') as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (file && file.size > MAX_CV_BYTES) {
+      event.preventDefault();
+      setFileError('Il file supera i 10 MB: allega un PDF più leggero.');
+      return;
+    }
+    setSending(true);
+  };
+  if (done) {
+    return (
+      <div className="apply-success" role="status">
+        <Check size={28} />
+        <h4>Candidatura inviata.</h4>
+        <p>Grazie! Abbiamo ricevuto i tuoi dati e il curriculum: ti ricontatteremo se il tuo profilo è in linea con le nostre ricerche.</p>
+        <button type="button" onClick={onReset}>Invia un’altra candidatura</button>
+      </div>
+    );
+  }
+  return (
+    <form className="apply-form" action={FORM_ENDPOINT} method="POST" encType="multipart/form-data" onSubmit={onSubmit}>
+      <FormHiddenFields subject="Candidatura dal sito — Lavora con noi" next="#candidatura-inviata" />
+      <div className="apply-form__row">
+        <label><span>Nome *</span><input required name="nome" autoComplete="given-name" /></label>
+        <label><span>Cognome *</span><input required name="cognome" autoComplete="family-name" /></label>
+      </div>
+      <div className="apply-form__row">
+        <label><span>Email *</span><input required type="email" name="email" autoComplete="email" /></label>
+        <label><span>Telefono</span><input type="tel" name="telefono" autoComplete="tel" /></label>
+      </div>
+      <label>
+        <span>Profilo *</span>
+        <select required name="profilo" defaultValue="">
+          <option value="" disabled>Scegli…</option>
+          {careerRoles.map((r) => <option key={r} value={r}>{r}</option>)}
+          <option value="Altro">Altro</option>
+        </select>
+      </label>
+      <label>
+        <span>Curriculum / Portfolio * <small>PDF o Word, max 10 MB</small></span>
+        <input required type="file" name="curriculum" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={() => setFileError('')} />
+        {fileError && <em className="apply-form__error">{fileError}</em>}
+      </label>
+      <label><span>Due righe su di te</span><textarea name="messaggio" rows={3} /></label>
+      <PrivacyCheck after=" e acconsento al trattamento dei miei dati personali ai fini della selezione" />
+      <button className="button button--primary" type="submit" disabled={sending}>
+        {sending ? 'Invio in corso…' : <>Invia candidatura <ArrowRight size={17} /></>}
+      </button>
+    </form>
+  );
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [sent, setSent] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [sending, setSending] = useState(false);
   const [activeServiceSlug, setActiveServiceSlug] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>('Tutti');
   const [openProject, setOpenProject] = useState<Project | null>(null);
@@ -981,7 +1069,15 @@ function App() {
       setLegalPage(lp as 'privacy' | 'cookie' | null);
       const certs = h === '#certificazioni';
       setShowCerts(certs);
-      if (h.startsWith(prefix) || lp || certs) {
+      // Ritorno da FormSubmit dopo l'invio di un modulo
+      const formTarget = h === '#candidatura-inviata' ? 'careers-cta' : h === '#richiesta-inviata' ? 'progetto' : null;
+      if (h === '#candidatura-inviata') setApplied(true);
+      if (h === '#richiesta-inviata') setSent(true);
+      if (formTarget) {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          document.getElementById(formTarget)?.scrollIntoView({ block: 'start' });
+        }));
+      } else if (h.startsWith(prefix) || lp || certs) {
         window.scrollTo(0, 0);
       } else if (h.length > 1) {
         // Da una sotto-pagina (servizio, certificazioni, privacy) la home viene
@@ -998,18 +1094,8 @@ function App() {
     return () => window.removeEventListener('hashchange', syncFromHash);
   }, []);
 
-  // Il sito è statico: la richiesta viene preparata come email e aperta
-  // nel programma di posta del visitatore, già indirizzata allo studio.
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const name = String(data.get('name') ?? '').trim();
-    const email = String(data.get('email') ?? '').trim();
-    const message = String(data.get('message') ?? '').trim();
-    const subject = `Richiesta dal sito — ${name}`;
-    const body = `${message}\n\n—\n${name}\n${email}`;
-    window.location.href = `mailto:info@studioingegneriamaggi.it?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setSent(true);
+  const clearFormHash = () => {
+    if (window.location.hash.endsWith('-inviata')) history.replaceState(null, '', window.location.pathname + window.location.search);
   };
 
   const closeMenu = () => setMenuOpen(false);
@@ -1325,14 +1411,9 @@ function App() {
                 <div className="careers-cta" id="careers-cta">
                   <span className="eyebrow">Candidatura spontanea</span>
                   <h3>Mandaci il tuo curriculum.</h3>
-                  <p>Non trovi la tua figura nell’elenco? Scrivici comunque: valutiamo con attenzione ogni candidatura spontanea. Allega il CV e due righe su di te.</p>
-                  <a
-                    className="button button--primary"
-                    href="mailto:info@studioingegneriamaggi.it?subject=Candidatura%20%E2%80%94%20Lavora%20con%20noi"
-                  >
-                    Candidati ora <ArrowRight size={17} />
-                  </a>
-                  <p className="careers-cta__hint">Oppure scrivi a <a href="mailto:info@studioingegneriamaggi.it">info@studioingegneriamaggi.it</a></p>
+                  <p>Compila il modulo e allega il tuo curriculum e/o portfolio. Non trovi la tua figura nell’elenco? Scrivici comunque: valutiamo con attenzione ogni candidatura spontanea.</p>
+                  <ApplyForm done={applied} onReset={() => { setApplied(false); clearFormHash(); }} />
+                  <p className="careers-cta__hint">Problemi con il modulo? Scrivi a <a href="mailto:info@studioingegneriamaggi.it">info@studioingegneriamaggi.it</a></p>
                 </div>
               </div>
             </section>
@@ -1348,22 +1429,25 @@ function App() {
               <a href={mapsUrl('Studio Ingegneria Maggi, Via Casavetere 25 bis/a, 03014 Fiuggi (FR)')} target="_blank" rel="noopener noreferrer" title="Apri in Google Maps">Via Casavetere, 25 bis/a<br />03014 Fiuggi (FR), Italia</a>
             </div>
           </div>
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form className="contact-form" action={FORM_ENDPOINT} method="POST" onSubmit={() => setSending(true)}>
             {sent ? (
-              <div className="form-success">
+              <div className="form-success" role="status">
                 <Check size={28} />
-                <span>Quasi fatto</span>
-                <h3>Controlla la tua email.</h3>
-                <p>Si è aperto il tuo programma di posta con il messaggio già pronto: premi «Invia» per farlo arrivare allo studio. Se non si è aperto, scrivici a <a href="mailto:info@studioingegneriamaggi.it">info@studioingegneriamaggi.it</a>.</p>
-                <button type="button" onClick={() => setSent(false)}>Invia un altro messaggio</button>
+                <span>Messaggio inviato</span>
+                <h3>Grazie, ti risponderemo presto.</h3>
+                <p>Abbiamo ricevuto la tua richiesta: lo studio ti risponderà all’indirizzo email che hai indicato.</p>
+                <button type="button" onClick={() => { setSent(false); setSending(false); clearFormHash(); }}>Invia un altro messaggio</button>
               </div>
             ) : (
               <>
+                <FormHiddenFields subject="Richiesta dal sito — Parliamo del progetto" next="#richiesta-inviata" />
                 <p className="form-label">Scrivici una nota</p>
-                <label><span>Nome e cognome</span><input required name="name" placeholder="Come possiamo chiamarti?" /></label>
-                <label><span>Email</span><input required type="email" name="email" placeholder="La tua email" /></label>
-                <label><span>Il progetto</span><textarea required name="message" rows={4} placeholder="Raccontaci brevemente la tua esigenza..." /></label>
-                <button className="button button--primary" type="submit">Invia la richiesta <ArrowRight size={17} /></button>
+                <label><span>Nome e cognome</span><input required name="nome" placeholder="Come possiamo chiamarti?" autoComplete="name" /></label>
+                <label><span>Email</span><input required type="email" name="email" placeholder="La tua email" autoComplete="email" /></label>
+                <label><span>Telefono (facoltativo)</span><input type="tel" name="telefono" placeholder="Per richiamarti" autoComplete="tel" /></label>
+                <label><span>Il progetto</span><textarea required name="messaggio" rows={4} placeholder="Raccontaci brevemente la tua esigenza..." /></label>
+                <PrivacyCheck />
+                <button className="button button--primary" type="submit" disabled={sending}>{sending ? 'Invio in corso…' : <>Invia la richiesta <ArrowRight size={17} /></>}</button>
               </>
             )}
           </form>
